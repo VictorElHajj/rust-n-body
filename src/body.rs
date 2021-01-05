@@ -1,6 +1,6 @@
 use crate::vector::Vector2;
 
 pub struct Body {
-    pos: Vector2,
-    vel: Vector2,
+    pub pos: Vector2,
+    pub vel: Vector2,
 }
