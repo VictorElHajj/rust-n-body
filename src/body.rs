@@ -1,6 +1,6 @@
-use crate::vector::vector2;
+use crate::vector::Vector2;
 
-pub struct body {
-    pos: vector2,
-    vel: vector2,
+pub struct Body {
+    pos: Vector2,
+    vel: Vector2,
 }
