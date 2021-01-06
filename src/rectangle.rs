@@ -12,28 +12,28 @@ impl Rectangle {
         return p.x >= s.x && p.x <= (s.x + self.size) && p.y >= s.y && p.y <= (s.y + self.size);
     }
 
-    pub fn ne(&self) -> Rectangle {
+    pub fn north_east(&self) -> Rectangle {
         Rectangle {
             pos: Vector2::new(self.pos.x + self.size / 2.0, self.pos.y),
             size: self.size / 2.0,
         }
     }
 
-    pub fn se(&self) -> Rectangle {
+    pub fn south_east(&self) -> Rectangle {
         Rectangle {
             pos: Vector2::new(self.pos.x + self.size / 2.0, self.pos.y + self.size / 2.0),
             size: self.size / 2.0,
         }
     }
 
-    pub fn sw(&self) -> Rectangle {
+    pub fn south_west(&self) -> Rectangle {
         Rectangle {
             pos: Vector2::new(self.pos.x, self.pos.y + self.size / 2.0),
             size: self.size / 2.0,
         }
     }
 
-    pub fn nw(&self) -> Rectangle {
+    pub fn north_west(&self) -> Rectangle {
         Rectangle {
             pos: Vector2::new(self.pos.x, self.pos.y),
             size: self.size / 2.0,
@@ -80,9 +80,9 @@ mod tests {
             pos: Vector2::new(-5.0, -5.0),
             size: 5.0,
         };
-        assert_eq!(ne, r.ne());
-        assert_eq!(se, r.se());
-        assert_eq!(sw, r.sw());
-        assert_eq!(nw, r.nw());
+        assert_eq!(ne, r.north_east());
+        assert_eq!(se, r.south_east());
+        assert_eq!(sw, r.south_west());
+        assert_eq!(nw, r.north_west());
     }
 }
