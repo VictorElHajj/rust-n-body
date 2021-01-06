@@ -7,12 +7,12 @@ use rand::Rng;
 
 fn criterion_benchmark(c: &mut Criterion) {
     c.bench_function("quadtree insertion", |b| {
-        let mut qt = QuadTree::new(Rectangle {
-            pos: Vector2::new(-50.0, -50.0),
-            size: 100.0,
-        });
         let mut rng = rand::thread_rng();
         b.iter(|| {
+            let mut qt = QuadTree::new(Rectangle {
+                pos: Vector2::new(-50.0, -50.0),
+                size: 100.0,
+            });
             for _ in 0..1000 {
                 let b = Body {
                     pos: Vector2::new(rng.gen_range(-50.0..50.0), rng.gen_range(-50.0..50.0)),
