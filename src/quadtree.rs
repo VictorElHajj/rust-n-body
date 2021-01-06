@@ -21,7 +21,7 @@ pub struct Root {
 }
 
 impl QuadTree {
-    fn new(boundary: Rectangle) -> QuadTree {
+    pub fn new(boundary: Rectangle) -> QuadTree {
         QuadTree::Leaf(Leaf {
             boundary: boundary,
             body: None,
@@ -50,7 +50,7 @@ impl QuadTree {
         }
     }
 
-    fn insert(&mut self, b1: Body) -> Result<(), String> {
+    pub fn insert(&mut self, b1: Body) -> Result<(), String> {
         match self {
             // Occupied leaf, split into root
             QuadTree::Leaf(Leaf {
