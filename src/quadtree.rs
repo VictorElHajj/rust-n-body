@@ -110,12 +110,12 @@ mod tests {
         });
         let b1 = Body {
             pos: Vector2::new(4.0, -4.0),
-            vel: Vector2::new(0.0, 0.0),
+            vel: Vector2::zero(),
             mass: 1.0,
         };
         let b2 = Body {
             pos: Vector2::new(3.0, -4.0),
-            vel: Vector2::new(0.0, 0.0),
+            vel: Vector2::zero(),
             mass: 10.0,
         };
         assert!(qt.insert(b1).is_ok());

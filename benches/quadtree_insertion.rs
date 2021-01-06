@@ -16,7 +16,7 @@ fn criterion_benchmark(c: &mut Criterion) {
             for _ in 0..1000 {
                 let b = Body {
                     pos: Vector2::new(rng.gen_range(-50.0..50.0), rng.gen_range(-50.0..50.0)),
-                    vel: Vector2::new(0.0, 0.0),
+                    vel: Vector2::zero(),
                     mass: rng.gen_range(1.0..100.0),
                 };
                 qt.insert(black_box(b)).ok();
