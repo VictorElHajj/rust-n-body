@@ -12,12 +12,13 @@ pub struct Leaf {
 }
 
 pub struct Root {
+    boundary: Rectangle,
     center_of_mass: Vector2,
     mass: f64,
-    ne: Box<QuadTree>,
-    se: Box<QuadTree>,
-    sw: Box<QuadTree>,
-    nw: Box<QuadTree>,
+    ne: Option<Box<QuadTree>>,
+    se: Option<Box<QuadTree>>,
+    sw: Option<Box<QuadTree>>,
+    nw: Option<Box<QuadTree>>,
 }
 
 impl QuadTree {
@@ -32,12 +33,13 @@ impl QuadTree {
         match self {
             QuadTree::Leaf(Leaf { boundary, body }) => {
                 let mut qt = QuadTree::Root(Root {
+                    boundary: *boundary,
                     center_of_mass: Vector2::new(0.0, 0.0),
                     mass: 0.0,
-                    ne: Box::new(QuadTree::new(boundary.north_east())),
-                    se: Box::new(QuadTree::new(boundary.south_east())),
-                    sw: Box::new(QuadTree::new(boundary.south_west())),
-                    nw: Box::new(QuadTree::new(boundary.north_west())),
+                    ne: None,
+                    se: None,
+                    sw: None,
+                    nw: None,
                 });
                 match body {
                     Some(body) => qt.insert(*body),
@@ -57,7 +59,7 @@ impl QuadTree {
                 boundary,
                 body: Some(_),
             }) => {
-                if boundary.inside(&b1.pos) {
+                if boundary.contains(&b1.pos) {
                     self.subdivide();
                     return self.insert(b1);
                 } else {
@@ -66,7 +68,7 @@ impl QuadTree {
             }
             // Empty leaf, just enter the body
             QuadTree::Leaf(leaf) => {
-                if leaf.boundary.inside(&b1.pos) {
+                if leaf.boundary.contains(&b1.pos) {
                     leaf.body = Some(b1);
                     return Ok(());
                 } else {
@@ -74,22 +76,42 @@ impl QuadTree {
                 }
             }
             QuadTree::Root(root) => {
-                if root.ne.insert(b1).is_ok() {
+                if root.boundary.north_east().contains(&b1.pos) {
+                    let qt = QuadTree::Leaf(Leaf {
+                        boundary: root.boundary.north_east(),
+                        body: Some(b1),
+                    });
+                    root.ne = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
                     root.mass += b1.mass;
-                    return Ok(());
-                } else if root.se.insert(b1).is_ok() {
+                    Ok(())
+                } else if root.boundary.south_east().contains(&b1.pos) {
+                    let qt = QuadTree::Leaf(Leaf {
+                        boundary: root.boundary.south_east(),
+                        body: Some(b1),
+                    });
+                    root.se = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
                     root.mass += b1.mass;
-                    return Ok(());
-                } else if root.sw.insert(b1).is_ok() {
+                    Ok(())
+                } else if root.boundary.south_west().contains(&b1.pos) {
+                    let qt = QuadTree::Leaf(Leaf {
+                        boundary: root.boundary.south_west(),
+                        body: Some(b1),
+                    });
+                    root.sw = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
                     root.mass += b1.mass;
-                    return Ok(());
-                } else if root.nw.insert(b1).is_ok() {
+                    Ok(())
+                } else if root.boundary.north_west().contains(&b1.pos) {
+                    let qt = QuadTree::Leaf(Leaf {
+                        boundary: root.boundary.north_west(),
+                        body: Some(b1),
+                    });
+                    root.nw = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
                     root.mass += b1.mass;
-                    return Ok(());
+                    Ok(())
                 } else {
                     return Err("Inserted body is outside boundary");
                 }

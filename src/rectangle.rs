@@ -1,5 +1,5 @@
 use crate::vector::Vector2;
-#[derive(PartialEq, Debug)]
+#[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Rectangle {
     /// Top left corner of rectangle
     pub pos: Vector2,
@@ -7,7 +7,7 @@ pub struct Rectangle {
 }
 
 impl Rectangle {
-    pub fn inside(&self, p: &Vector2) -> bool {
+    pub fn contains(&self, p: &Vector2) -> bool {
         let s = &self.pos;
         return p.x >= s.x && p.x <= (s.x + self.size) && p.y >= s.y && p.y <= (s.y + self.size);
     }
@@ -54,8 +54,8 @@ mod tests {
         let p1 = Vector2::new(1.0, 4.0);
         let p2 = Vector2::new(-6.0, 4.0);
 
-        assert!(r.inside(&p1));
-        assert!(!r.inside(&p2));
+        assert!(r.contains(&p1));
+        assert!(!r.contains(&p2));
     }
 
     #[test]
