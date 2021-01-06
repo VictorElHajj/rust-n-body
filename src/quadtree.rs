@@ -84,10 +84,31 @@ impl QuadTree {
                     root.mass += b1.mass;
                     return Ok(());
                 } else if root.se.insert(b1).is_ok() {
+                    root.center_of_mass = Vector2::new(
+                        (b1.pos.x * b1.mass + root.mass * root.center_of_mass.x)
+                            / (root.mass + b1.mass),
+                        (b1.pos.y * b1.mass + root.mass * root.center_of_mass.y)
+                            / (root.mass + b1.mass),
+                    );
+                    root.mass += b1.mass;
                     return Ok(());
                 } else if root.sw.insert(b1).is_ok() {
+                    root.center_of_mass = Vector2::new(
+                        (b1.pos.x * b1.mass + root.mass * root.center_of_mass.x)
+                            / (root.mass + b1.mass),
+                        (b1.pos.y * b1.mass + root.mass * root.center_of_mass.y)
+                            / (root.mass + b1.mass),
+                    );
+                    root.mass += b1.mass;
                     return Ok(());
                 } else if root.nw.insert(b1).is_ok() {
+                    root.center_of_mass = Vector2::new(
+                        (b1.pos.x * b1.mass + root.mass * root.center_of_mass.x)
+                            / (root.mass + b1.mass),
+                        (b1.pos.y * b1.mass + root.mass * root.center_of_mass.y)
+                            / (root.mass + b1.mass),
+                    );
+                    root.mass += b1.mass;
                     return Ok(());
                 } else {
                     return Err(String::from("Inserted is outside boundary"));
