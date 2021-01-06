@@ -50,7 +50,7 @@ impl QuadTree {
         }
     }
 
-    pub fn insert(&mut self, b1: Body) -> Result<(), String> {
+    pub fn insert(&mut self, b1: Body) -> Result<(), &'static str> {
         match self {
             // Occupied leaf, split into root
             QuadTree::Leaf(Leaf {
@@ -61,7 +61,7 @@ impl QuadTree {
                     self.subdivide();
                     return self.insert(b1);
                 } else {
-                    return Err(String::from("Inserted body is outside boundary"));
+                    return Err("Inserted body is outside boundary");
                 }
             }
             // Empty leaf, just enter the body
@@ -70,7 +70,7 @@ impl QuadTree {
                     leaf.body = Some(b1);
                     return Ok(());
                 } else {
-                    return Err(String::from("Inserted body is outside boundary"));
+                    return Err("Inserted body is outside boundary");
                 }
             }
             QuadTree::Root(root) => {
@@ -111,7 +111,7 @@ impl QuadTree {
                     root.mass += b1.mass;
                     return Ok(());
                 } else {
-                    return Err(String::from("Inserted is outside boundary"));
+                    return Err("Inserted body is outside boundary");
                 }
             }
         }
