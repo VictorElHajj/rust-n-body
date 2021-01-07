@@ -8,7 +8,7 @@ pub enum QuadTree {
 
 pub struct Leaf {
     boundary: Rectangle,
-    body: Option<Body>,
+    body: Body,
 }
 
 pub struct Root {
@@ -23,9 +23,14 @@ pub struct Root {
 
 impl QuadTree {
     pub fn new(boundary: Rectangle) -> QuadTree {
-        QuadTree::Leaf(Leaf {
+        QuadTree::Root(Root {
             boundary: boundary,
-            body: None,
+            center_of_mass: Vector2::zero(),
+            mass: 0.0,
+            ne: None,
+            se: None,
+            sw: None,
+            nw: None,
         })
     }
 
@@ -41,11 +46,7 @@ impl QuadTree {
                     sw: None,
                     nw: None,
                 });
-                match body {
-                    Some(body) => qt.insert(*body),
-                    _ => Ok(()),
-                }
-                .ok();
+                qt.insert(*body);
                 *self = qt;
             }
             _ => (),
@@ -57,7 +58,7 @@ impl QuadTree {
             // Occupied leaf, split into root
             QuadTree::Leaf(Leaf {
                 boundary,
-                body: Some(_),
+                body: _,
             }) => {
                 if boundary.contains(&b1.pos) {
                     self.subdivide();
@@ -69,7 +70,7 @@ impl QuadTree {
             // Empty leaf, just enter the body
             QuadTree::Leaf(leaf) => {
                 if leaf.boundary.contains(&b1.pos) {
-                    leaf.body = Some(b1);
+                    leaf.body = b1;
                     return Ok(());
                 } else {
                     return Err("Inserted body is outside boundary");
@@ -79,7 +80,7 @@ impl QuadTree {
                 if root.boundary.north_east().contains(&b1.pos) {
                     let qt = QuadTree::Leaf(Leaf {
                         boundary: root.boundary.north_east(),
-                        body: Some(b1),
+                        body: b1,
                     });
                     root.ne = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
@@ -88,7 +89,7 @@ impl QuadTree {
                 } else if root.boundary.south_east().contains(&b1.pos) {
                     let qt = QuadTree::Leaf(Leaf {
                         boundary: root.boundary.south_east(),
-                        body: Some(b1),
+                        body: b1,
                     });
                     root.se = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
@@ -97,7 +98,7 @@ impl QuadTree {
                 } else if root.boundary.south_west().contains(&b1.pos) {
                     let qt = QuadTree::Leaf(Leaf {
                         boundary: root.boundary.south_west(),
-                        body: Some(b1),
+                        body: b1,
                     });
                     root.sw = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
@@ -106,7 +107,7 @@ impl QuadTree {
                 } else if root.boundary.north_west().contains(&b1.pos) {
                     let qt = QuadTree::Leaf(Leaf {
                         boundary: root.boundary.north_west(),
-                        body: Some(b1),
+                        body: b1,
                     });
                     root.nw = Some(Box::new(qt));
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
