@@ -67,14 +67,14 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.ne = Some(Box::new(qt));
-                            root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                            root.mass += b1.mass;
-                            Ok(())
                         } 
                         Some(qt) => {
-                           qt.insert(b1)
+                           qt.insert(b1)?;
                         }
                     }
+                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
+                    root.mass += b1.mass;
+                    Ok(())
                 } else if root.boundary.south_east().contains(&b1.pos) {
                     match &mut root.se {
                         None => {
@@ -83,14 +83,14 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.se = Some(Box::new(qt));
-                            root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                            root.mass += b1.mass;
-                            Ok(())
                         } 
                         Some(qt) => {
-                           qt.insert(b1)
+                           qt.insert(b1)?;
                         }
                     }
+                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
+                    root.mass += b1.mass;
+                    Ok(())
                 } else if root.boundary.south_west().contains(&b1.pos) {
                     match &mut root.sw {
                         None => {
@@ -99,14 +99,14 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.sw = Some(Box::new(qt));
-                            root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                            root.mass += b1.mass;
-                            Ok(())
                         } 
                         Some(qt) => {
-                           qt.insert(b1)
+                           qt.insert(b1)?;
                         }
                     }
+                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
+                    root.mass += b1.mass;
+                    Ok(())
                 } else if root.boundary.north_west().contains(&b1.pos) {
                     match &mut root.nw {
                         None => {
@@ -115,14 +115,14 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.nw = Some(Box::new(qt));
-                            root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                            root.mass += b1.mass;
-                            Ok(())
                         } 
                         Some(qt) => {
-                           qt.insert(b1)
+                           qt.insert(b1)?;
                         }
                     }
+                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
+                    root.mass += b1.mass;
+                    Ok(())
                 } else {
                     return Err("Inserted body is outside boundary");
                 }
@@ -130,6 +130,7 @@ impl QuadTree {
         }
     }
 
+    // Only for visualizing quad tree, expensive and inefficient.
     pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
         match self {
             QuadTree::Leaf(leaf) => {
