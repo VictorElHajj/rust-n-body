@@ -13,10 +13,12 @@ fn criterion_benchmark(c: &mut Criterion) {
                 pos: Vector2::new(-50.0, -50.0),
                 size: 100.0,
             });
-            for _ in 0..1000 {
+            for i in 0..1000 {
                 let b = Body {
+                    id: i,
                     pos: Vector2::new(rng.gen_range(-50.0..50.0), rng.gen_range(-50.0..50.0)),
                     vel: Vector2::zero(),
+                    acc: Vector2::zero(),
                     mass: rng.gen_range(1.0..100.0),
                 };
                 qt.insert(black_box(b)).ok();
