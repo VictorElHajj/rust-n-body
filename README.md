@@ -6,3 +6,4 @@ Batch drawing
 
 Todo:
 Track total system energy
+Better smoothing
