@@ -1,4 +1,8 @@
-use ggez::{Context, GameResult, graphics::{self}, mint::Point2};
+use ggez::{
+    graphics::{self},
+    mint::Point2,
+    Context, GameResult,
+};
 
 use crate::{body::Body, physics_helper::*, rectangle::Rectangle, vector::Vector2};
 
@@ -10,17 +14,17 @@ pub enum QuadTree {
 
 pub struct Leaf {
     boundary: Rectangle,
-    body: Body,
+    pub body: Body,
 }
 
 pub struct Root {
-    boundary: Rectangle,
-    center_of_mass: Vector2,
-    mass: f64,
-    ne: Option<Box<QuadTree>>,
-    se: Option<Box<QuadTree>>,
-    sw: Option<Box<QuadTree>>,
-    nw: Option<Box<QuadTree>>,
+    pub boundary: Rectangle,
+    pub center_of_mass: Vector2,
+    pub mass: f64,
+    pub ne: Option<Box<QuadTree>>,
+    pub se: Option<Box<QuadTree>>,
+    pub sw: Option<Box<QuadTree>>,
+    pub nw: Option<Box<QuadTree>>,
 }
 
 impl QuadTree {
@@ -67,9 +71,9 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.ne = Some(Box::new(qt));
-                        } 
+                        }
                         Some(qt) => {
-                           qt.insert(b1)?;
+                            qt.insert(b1)?;
                         }
                     }
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
@@ -83,9 +87,9 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.se = Some(Box::new(qt));
-                        } 
+                        }
                         Some(qt) => {
-                           qt.insert(b1)?;
+                            qt.insert(b1)?;
                         }
                     }
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
@@ -99,9 +103,9 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.sw = Some(Box::new(qt));
-                        } 
+                        }
                         Some(qt) => {
-                           qt.insert(b1)?;
+                            qt.insert(b1)?;
                         }
                     }
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
@@ -115,9 +119,9 @@ impl QuadTree {
                                 body: b1,
                             });
                             root.nw = Some(Box::new(qt));
-                        } 
+                        }
                         Some(qt) => {
-                           qt.insert(b1)?;
+                            qt.insert(b1)?;
                         }
                     }
                     root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
@@ -135,54 +139,138 @@ impl QuadTree {
         match self {
             QuadTree::Leaf(leaf) => {
                 // Draw boundary
-                let bounds = graphics::Rect::new(leaf.boundary.pos.x as f32, leaf.boundary.pos.y as f32, leaf.boundary.size as f32, leaf.boundary.size as f32);
-                let rectangle = graphics::Mesh::new_rectangle(ctx, graphics::DrawMode::stroke(1.0), bounds, graphics::WHITE)?;
-                graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))?;
+                let bounds = graphics::Rect::new(
+                    leaf.boundary.pos.x as f32,
+                    leaf.boundary.pos.y as f32,
+                    leaf.boundary.size as f32,
+                    leaf.boundary.size as f32,
+                );
+                let rectangle = graphics::Mesh::new_rectangle(
+                    ctx,
+                    graphics::DrawMode::stroke(1.0),
+                    bounds,
+                    graphics::WHITE,
+                )?;
+                graphics::draw(
+                    ctx,
+                    &rectangle,
+                    (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
+                )?;
                 // Draw body
-                let circle = graphics::Mesh::new_circle(ctx, graphics::DrawMode::fill(), Point2 {x: leaf.body.pos.x as f32, y: leaf.body.pos.y as f32}, 2.0, 1.0, graphics::WHITE)?;
-                graphics::draw(ctx, &circle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))?;
+                let circle = graphics::Mesh::new_circle(
+                    ctx,
+                    graphics::DrawMode::fill(),
+                    Point2 {
+                        x: leaf.body.pos.x as f32,
+                        y: leaf.body.pos.y as f32,
+                    },
+                    2.0,
+                    1.0,
+                    graphics::WHITE,
+                )?;
+                graphics::draw(ctx, &circle, (ggez::mint::Point2 { x: 500.0, y: 500.0 },))?;
                 Ok(())
-            } 
+            }
             QuadTree::Root(root) => {
                 match &root.ne {
                     None => {
                         let r = root.boundary.north_east();
-                        let bounds = graphics::Rect::new(r.pos.x as f32, r.pos.y as f32, r.size as f32, r.size as f32);
-                        let rectangle = graphics::Mesh::new_rectangle(ctx, graphics::DrawMode::stroke(1.0), bounds, graphics::WHITE)?;
-                        graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))
-                    },
-                    Some(qt ) => qt.draw(ctx),
-                }.ok(); 
+                        let bounds = graphics::Rect::new(
+                            r.pos.x as f32,
+                            r.pos.y as f32,
+                            r.size as f32,
+                            r.size as f32,
+                        );
+                        let rectangle = graphics::Mesh::new_rectangle(
+                            ctx,
+                            graphics::DrawMode::stroke(1.0),
+                            bounds,
+                            graphics::WHITE,
+                        )?;
+                        graphics::draw(
+                            ctx,
+                            &rectangle,
+                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
+                        )
+                    }
+                    Some(qt) => qt.draw(ctx),
+                }
+                .ok();
                 match &root.se {
                     None => {
                         let r = root.boundary.south_east();
-                        let bounds = graphics::Rect::new(r.pos.x as f32, r.pos.y as f32, r.size as f32, r.size as f32);
-                        let rectangle = graphics::Mesh::new_rectangle(ctx, graphics::DrawMode::stroke(1.0), bounds, graphics::WHITE)?;
-                        graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))
-                    },
-                    Some(qt ) => qt.draw(ctx),
-                }.ok(); 
+                        let bounds = graphics::Rect::new(
+                            r.pos.x as f32,
+                            r.pos.y as f32,
+                            r.size as f32,
+                            r.size as f32,
+                        );
+                        let rectangle = graphics::Mesh::new_rectangle(
+                            ctx,
+                            graphics::DrawMode::stroke(1.0),
+                            bounds,
+                            graphics::WHITE,
+                        )?;
+                        graphics::draw(
+                            ctx,
+                            &rectangle,
+                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
+                        )
+                    }
+                    Some(qt) => qt.draw(ctx),
+                }
+                .ok();
                 match &root.sw {
                     None => {
                         let r = root.boundary.south_west();
-                        let bounds = graphics::Rect::new(r.pos.x as f32, r.pos.y as f32, r.size as f32, r.size as f32);
-                        let rectangle = graphics::Mesh::new_rectangle(ctx, graphics::DrawMode::stroke(1.0), bounds, graphics::WHITE)?;
-                        graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))
-                    },
-                    Some(qt ) => qt.draw(ctx),
-                }.ok(); 
+                        let bounds = graphics::Rect::new(
+                            r.pos.x as f32,
+                            r.pos.y as f32,
+                            r.size as f32,
+                            r.size as f32,
+                        );
+                        let rectangle = graphics::Mesh::new_rectangle(
+                            ctx,
+                            graphics::DrawMode::stroke(1.0),
+                            bounds,
+                            graphics::WHITE,
+                        )?;
+                        graphics::draw(
+                            ctx,
+                            &rectangle,
+                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
+                        )
+                    }
+                    Some(qt) => qt.draw(ctx),
+                }
+                .ok();
                 match &root.nw {
                     None => {
                         let r = root.boundary.north_west();
-                        let bounds = graphics::Rect::new(r.pos.x as f32, r.pos.y as f32, r.size as f32, r.size as f32);
-                        let rectangle = graphics::Mesh::new_rectangle(ctx, graphics::DrawMode::stroke(1.0), bounds, graphics::WHITE)?;
-                        graphics::draw(ctx, &rectangle, (ggez::mint::Point2 { x: 0.0, y: 0.0 },))
-                    },
-                    Some(qt ) => qt.draw(ctx),
-                }.ok(); 
+                        let bounds = graphics::Rect::new(
+                            r.pos.x as f32,
+                            r.pos.y as f32,
+                            r.size as f32,
+                            r.size as f32,
+                        );
+                        let rectangle = graphics::Mesh::new_rectangle(
+                            ctx,
+                            graphics::DrawMode::stroke(1.0),
+                            bounds,
+                            graphics::WHITE,
+                        )?;
+                        graphics::draw(
+                            ctx,
+                            &rectangle,
+                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
+                        )
+                    }
+                    Some(qt) => qt.draw(ctx),
+                }
+                .ok();
                 Ok(())
-            } 
-      }
+            }
+        }
     }
 }
 
@@ -197,13 +285,17 @@ mod tests {
             size: 10.0,
         });
         let b1 = Body {
+            id: 1,
             pos: Vector2::new(4.0, -4.0),
             vel: Vector2::zero(),
+            acc: Vector2::zero(),
             mass: 1.0,
         };
         let b2 = Body {
+            id: 2,
             pos: Vector2::new(3.0, -4.0),
             vel: Vector2::zero(),
+            acc: Vector2::zero(),
             mass: 10.0,
         };
         assert!(qt.insert(b1).is_ok());
