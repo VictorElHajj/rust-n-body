@@ -16,16 +16,28 @@ use rand::Rng;
 fn main() {
     let mut rng = rand::thread_rng();
     let mut bs = Vec::with_capacity(1000);
-    for i in 0..200 {
+    for i in 0..1000 {
         let b = Body {
             id: i,
-            pos: Vector2::new(rng.gen_range(-300.0..300.0), rng.gen_range(-300.0..300.0)),
-            vel: Vector2::zero(),
+            pos: Vector2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0))
+                * rng.gen_range(0.0..(i as f64 + 1.0)),
+            vel: Vector2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0))
+                * rng.gen_range(0.0..(i as f64 + 1.0))
+                / 100.0,
             acc: Vector2::zero(),
-            mass: 2_000_000_000.0,
+            mass: 2_000_000.0,
         };
         bs.push(b);
     }
+    // Black hole
+    let b = Body {
+        id: 1001,
+        pos: Vector2::zero(),
+        vel: Vector2::zero(),
+        acc: Vector2::zero(),
+        mass: 2_000_000_000_000.0,
+    };
+    bs.push(b);
 
     let mut sim = Simulation {
         bodies: Box::new(bs),
@@ -33,8 +45,8 @@ fn main() {
             pos: Vector2::zero(),
             size: 0.0,
         }),
-        timestep: 1.0,
-        theta: 0.5,
+        timestep: 0.1,
+        theta: 0.8,
     };
 
     let (mut ctx, mut event_loop) = ContextBuilder::new("my_game", "Cool Game Author")
