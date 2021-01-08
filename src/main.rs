@@ -64,7 +64,6 @@ fn main() {
     .ok();
 
     graphics::set_screen_coordinates(&mut ctx, graphics::Rect::new(0.0, 0.0, 1000.0, 1000.0)).ok();
-    graphics::present(&mut ctx);
 
     // Run!
     match event::run(&mut ctx, &mut event_loop, &mut my_game) {
