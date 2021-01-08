@@ -1,22 +1,40 @@
-use ggez::event::{self, EventHandler};
+use std::time::{self, Duration};
+
+use ggez::{
+    conf::{FullscreenType, WindowMode},
+    event::{self, EventHandler},
+    mint::Point2,
+    timer::sleep,
+};
 use ggez::{graphics, Context, ContextBuilder, GameResult};
-use n_body::{body::Body, quadtree::QuadTree, rectangle::Rectangle, vector::Vector2};
+use n_body::{
+    body::Body, quadtree::QuadTree, rectangle::Rectangle, simulation::Simulation, vector::Vector2,
+};
 use rand::Rng;
 
 fn main() {
     let mut rng = rand::thread_rng();
-    let mut qt = QuadTree::new(Rectangle {
-        pos: Vector2::new(0.0, 0.0),
-        size: 500.0,
-    });
-    for _ in 0..1000 {
+    let mut bs = Vec::with_capacity(1000);
+    for i in 0..200 {
         let b = Body {
-            pos: Vector2::new(rng.gen_range(0.0..800.0), rng.gen_range(0.0..800.0)),
+            id: i,
+            pos: Vector2::new(rng.gen_range(-300.0..300.0), rng.gen_range(-300.0..300.0)),
             vel: Vector2::zero(),
-            mass: rng.gen_range(1.0..100.0),
+            acc: Vector2::zero(),
+            mass: 2_000_000_000.0,
         };
-        qt.insert(b).ok();
+        bs.push(b);
     }
+
+    let mut sim = Simulation {
+        bodies: Box::new(bs),
+        qt: QuadTree::new(Rectangle {
+            pos: Vector2::zero(),
+            size: 0.0,
+        }),
+        timestep: 1.0,
+        theta: 0.5,
+    };
 
     let (mut ctx, mut event_loop) = ContextBuilder::new("my_game", "Cool Game Author")
         .build()
@@ -25,7 +43,27 @@ fn main() {
     // Create an instance of your event handler.
     // Usually, you should provide it with the Context object to
     // use when setting your game up.
-    let mut my_game = MyGame::new(&mut ctx, qt);
+    let mut my_game = MyGame::new(&mut ctx, sim);
+
+    graphics::set_mode(
+        &mut ctx,
+        WindowMode {
+            width: 1000.0,
+            height: 1000.0,
+            maximized: false,
+            fullscreen_type: FullscreenType::Windowed,
+            borderless: false,
+            min_width: 0.0,
+            max_width: 0.0,
+            min_height: 0.0,
+            max_height: 0.0,
+            resizable: false,
+        },
+    )
+    .ok();
+
+    graphics::set_screen_coordinates(&mut ctx, graphics::Rect::new(0.0, 0.0, 1000.0, 1000.0)).ok();
+    graphics::present(&mut ctx);
 
     // Run!
     match event::run(&mut ctx, &mut event_loop, &mut my_game) {
@@ -35,30 +73,45 @@ fn main() {
 }
 
 struct MyGame {
-    qt: QuadTree,
+    sim: Simulation,
     // Your state here...
 }
 
 impl MyGame {
-    pub fn new(_ctx: &mut Context, qt: QuadTree) -> MyGame {
+    pub fn new(_ctx: &mut Context, sim: Simulation) -> MyGame {
         // Load/create resources such as images here.
-        MyGame {
-            qt
-        }
+        MyGame { sim }
     }
 }
 
 impl EventHandler for MyGame {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
         // Update code here...
+        self.sim.update();
+        //std::thread::sleep(time::Duration::from_secs(1));
         Ok(())
     }
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
-        self.qt.draw(ctx)?;
-        graphics::present(ctx)?;
+        for b in self.sim.bodies.iter() {
+            let circle = graphics::Mesh::new_circle(
+                ctx,
+                graphics::DrawMode::fill(),
+                Point2 {
+                    x: b.pos.x as f32,
+                    y: b.pos.y as f32,
+                },
+                2.0,
+                1.0,
+                graphics::WHITE,
+            )?;
+            graphics::draw(ctx, &circle, (ggez::mint::Point2 { x: 500.0, y: 500.0 },))?;
+        }
 
+        //self.sim.qt.draw(ctx);
+
+        graphics::present(ctx)?;
         Ok(())
     }
 }
