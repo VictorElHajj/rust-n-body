@@ -7,6 +7,7 @@ use ggez::{
     timer::sleep,
 };
 use ggez::{graphics, Context, ContextBuilder, GameResult};
+use graphics::MeshBuilder;
 use n_body::{
     body::Body, quadtree::QuadTree, rectangle::Rectangle, simulation::Simulation, vector::Vector2,
 };
@@ -94,9 +95,10 @@ impl EventHandler for MyGame {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
+
+        let mut builder = MeshBuilder::new();
         for b in self.sim.bodies.iter() {
-            let circle = graphics::Mesh::new_circle(
-                ctx,
+            builder.circle(
                 graphics::DrawMode::fill(),
                 Point2 {
                     x: b.pos.x as f32,
@@ -105,9 +107,10 @@ impl EventHandler for MyGame {
                 2.0,
                 1.0,
                 graphics::WHITE,
-            )?;
-            graphics::draw(ctx, &circle, (ggez::mint::Point2 { x: 500.0, y: 500.0 },))?;
+            );
         }
+        let mesh = builder.build(ctx)?;
+        graphics::draw(ctx, &mesh, (ggez::mint::Point2 { x: 500.0, y: 500.0 },))?;
 
         //self.sim.qt.draw(ctx);
 
