@@ -1,5 +1,7 @@
 use std::ops::{Add, Div, Mul, Sub};
 
+const EPSILON: f64 = 0.00001;
+
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Vector2 {
     pub x: f64,
@@ -16,11 +18,11 @@ impl Vector2 {
     }
 
     pub fn distance(&self, other: Self) -> f64 {
-        ((self.x - other.x).powi(2) + (self.y - other.y).powi(2)).sqrt()
+        ((self.x - other.x).powi(2) + (self.y - other.y).powi(2) + EPSILON).sqrt()
     }
 
     pub fn distance_2(&self, other: Self) -> f64 {
-        (self.x - other.x).powi(2) + (self.y - other.y).powi(2)
+        (self.x - other.x).powi(2) + (self.y - other.y).powi(2) + EPSILON
     }
 
     pub fn normal_vector_between(&self, other: Self) -> Self {
