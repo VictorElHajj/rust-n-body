@@ -3,3 +3,6 @@ Goal is to implement a N-Body simulation in the Rust language using the Barnes-H
 
 Optimization steps:
 Batch drawing
+
+Todo:
+Track total system energy
