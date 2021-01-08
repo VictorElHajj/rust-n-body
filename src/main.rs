@@ -95,25 +95,7 @@ impl EventHandler for MyGame {
 
     fn draw(&mut self, ctx: &mut Context) -> GameResult<()> {
         graphics::clear(ctx, graphics::BLACK);
-
-        let mut builder = MeshBuilder::new();
-        for b in self.sim.bodies.iter() {
-            builder.circle(
-                graphics::DrawMode::fill(),
-                Point2 {
-                    x: b.pos.x as f32,
-                    y: b.pos.y as f32,
-                },
-                2.0,
-                1.0,
-                graphics::WHITE,
-            );
-        }
-        let mesh = builder.build(ctx)?;
-        graphics::draw(ctx, &mesh, (ggez::mint::Point2 { x: 500.0, y: 500.0 },))?;
-
-        //self.sim.qt.draw(ctx);
-
+        self.sim.draw(ctx)?;
         graphics::present(ctx)?;
         Ok(())
     }

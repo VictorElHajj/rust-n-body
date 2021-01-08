@@ -1,3 +1,9 @@
+use ggez::{
+    graphics::{self, MeshBuilder},
+    mint::Point2,
+    Context, GameResult,
+};
+
 use crate::{
     body::Body,
     physics_helper::{calc_pull, calc_pull_com},
@@ -40,6 +46,25 @@ impl Simulation {
         }
 
         self.qt = qt;
+    }
+
+    pub fn draw(&self, ctx: &mut Context) -> GameResult<()> {
+        let mut builder = MeshBuilder::new();
+        for b in self.bodies.iter() {
+            builder.circle(
+                graphics::DrawMode::fill(),
+                Point2 {
+                    x: b.pos.x as f32,
+                    y: b.pos.y as f32,
+                },
+                2.0,
+                1.0,
+                graphics::WHITE,
+            );
+        }
+        let mesh = builder.build(ctx)?;
+        graphics::draw(ctx, &mesh, (ggez::mint::Point2 { x: 500.0, y: 500.0 },))?;
+        Ok(())
     }
 
     fn apply_forces(theta: f64, b: &Body, qt: &QuadTree) -> Vector2 {
