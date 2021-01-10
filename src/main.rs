@@ -1,13 +1,8 @@
-use std::time::{self, Duration};
-
 use ggez::{
     conf::{FullscreenType, WindowMode},
     event::{self, EventHandler},
-    mint::Point2,
-    timer::sleep,
 };
 use ggez::{graphics, Context, ContextBuilder, GameResult};
-use graphics::MeshBuilder;
 use n_body::{
     body::Body, quadtree::QuadTree, rectangle::Rectangle, simulation::Simulation, vector::Vector2,
 };
@@ -39,13 +34,13 @@ fn main() {
     };
     bs.push(b);
 
-    let mut sim = Simulation {
+    let sim = Simulation {
         bodies: Box::new(bs),
         qt: QuadTree::new(Rectangle {
             pos: Vector2::zero(),
             size: 0.0,
         }),
-        timestep: 0.1,
+        timestep: 1.0,
         theta: 0.8,
     };
 
@@ -100,6 +95,13 @@ impl EventHandler for MyGame {
     fn update(&mut self, _ctx: &mut Context) -> GameResult<()> {
         // Update code here...
         self.sim.update();
+
+        //let mut ke: f64 = 0.0;
+        //for b in self.sim.bodies.iter() {
+        //    ke += 0.5 * b.mass * Vector2::zero().distance(b.vel).powi(2);
+        //}
+        //println!("System kinetic energy: {}", ke);
+
         //std::thread::sleep(time::Duration::from_secs(1));
         Ok(())
     }

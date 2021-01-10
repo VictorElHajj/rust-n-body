@@ -41,7 +41,7 @@ impl Simulation {
         for b in self.bodies.iter_mut() {
             b.pos = b.pos + b.vel * self.timestep + b.acc * self.timestep * self.timestep * 0.5;
             let old_acc = b.acc;
-            b.acc = Simulation::apply_forces(self.theta, b, &qt) / b.mass * G;
+            b.acc = Simulation::apply_forces(self.theta, &b, &qt) / b.mass * G;
             b.vel = b.vel + (b.acc + old_acc) * (self.timestep * 0.5);
         }
 

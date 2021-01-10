@@ -1,6 +1,6 @@
 use std::ops::{Add, Div, Mul, Sub};
 
-const EPSILON: f64 = 0.1;
+const EPSILON: f64 = 0.001;
 
 #[derive(PartialEq, Debug, Copy, Clone)]
 pub struct Vector2 {
