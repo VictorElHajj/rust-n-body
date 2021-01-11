@@ -9,7 +9,12 @@ pub struct Cube {
 impl Cube {
     pub fn contains(&self, p: &Vector3) -> bool {
         let s = &self.pos;
-        return p.x >= s.x && p.x <= (s.x + self.size) && p.y >= s.y && p.y <= (s.y + self.size);
+        p.x >= s.x
+            && p.x <= (s.x + self.size)
+            && p.y >= s.y
+            && p.y <= (s.y + self.size)
+            && p.z >= s.z
+            && p.z <= (s.z + self.size)
     }
 
     pub fn top_north_east(&self) -> Cube {
