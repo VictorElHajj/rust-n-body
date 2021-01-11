@@ -4,7 +4,12 @@ use ggez::{
     Context, GameResult,
 };
 
-use crate::{body::Body, cube::Cube, physics_helper::*, vector::Vector3};
+use crate::{
+    body::Body,
+    cube::{Cube, Region},
+    physics_helper::*,
+    vector::Vector3,
+};
 
 /// A quadtree with a bucket size of one
 pub enum OcTree {
@@ -67,130 +72,31 @@ impl OcTree {
                     self.subdivide();
                     return self.insert(b1);
                 } else {
+                    println!("Tried to insert {:?}", b1.pos);
+                    println!("into {:?}", leaf.boundary);
                     return Err("Inserted body is outside boundary");
                 }
             }
             OcTree::Root(root) => {
-                if root.boundary.top_north_east().contains(&b1.pos) {
-                    match &mut root.tne {
+                if root.boundary.contains(&b1.pos) {
+                    let region = root.boundary.region(&b1.pos);
+                    let node = match region {
+                        Region::TNE => &mut root.tne,
+                        Region::TSE => &mut root.tse,
+                        Region::TSW => &mut root.tsw,
+                        Region::TNW => &mut root.tnw,
+                        Region::BNE => &mut root.bne,
+                        Region::BSE => &mut root.bse,
+                        Region::BSW => &mut root.bsw,
+                        Region::BNW => &mut root.bnw,
+                    };
+                    match node {
                         None => {
                             let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.top_north_east(),
+                                boundary: root.boundary.region_boundary(region),
                                 body: b1,
                             });
-                            root.tne = Some(Box::new(ot));
-                        }
-                        Some(ot) => {
-                            ot.insert(b1)?;
-                        }
-                    }
-                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                    root.mass += b1.mass;
-                    Ok(())
-                } else if root.boundary.top_south_east().contains(&b1.pos) {
-                    match &mut root.tse {
-                        None => {
-                            let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.top_south_east(),
-                                body: b1,
-                            });
-                            root.tse = Some(Box::new(ot));
-                        }
-                        Some(ot) => {
-                            ot.insert(b1)?;
-                        }
-                    }
-                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                    root.mass += b1.mass;
-                    Ok(())
-                } else if root.boundary.top_south_west().contains(&b1.pos) {
-                    match &mut root.tsw {
-                        None => {
-                            let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.top_south_west(),
-                                body: b1,
-                            });
-                            root.tsw = Some(Box::new(ot));
-                        }
-                        Some(ot) => {
-                            ot.insert(b1)?;
-                        }
-                    }
-                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                    root.mass += b1.mass;
-                    Ok(())
-                } else if root.boundary.top_north_west().contains(&b1.pos) {
-                    match &mut root.tnw {
-                        None => {
-                            let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.top_north_west(),
-                                body: b1,
-                            });
-                            root.tnw = Some(Box::new(ot));
-                        }
-                        Some(ot) => {
-                            ot.insert(b1)?;
-                        }
-                    }
-                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                    root.mass += b1.mass;
-                    Ok(())
-                } else if root.boundary.bottom_north_east().contains(&b1.pos) {
-                    match &mut root.bne {
-                        None => {
-                            let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.bottom_north_east(),
-                                body: b1,
-                            });
-                            root.bne = Some(Box::new(ot));
-                        }
-                        Some(ot) => {
-                            ot.insert(b1)?;
-                        }
-                    }
-                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                    root.mass += b1.mass;
-                    Ok(())
-                } else if root.boundary.bottom_south_east().contains(&b1.pos) {
-                    match &mut root.bse {
-                        None => {
-                            let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.bottom_south_east(),
-                                body: b1,
-                            });
-                            root.bse = Some(Box::new(ot));
-                        }
-                        Some(ot) => {
-                            ot.insert(b1)?;
-                        }
-                    }
-                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                    root.mass += b1.mass;
-                    Ok(())
-                } else if root.boundary.bottom_south_west().contains(&b1.pos) {
-                    match &mut root.bsw {
-                        None => {
-                            let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.bottom_south_west(),
-                                body: b1,
-                            });
-                            root.bsw = Some(Box::new(ot));
-                        }
-                        Some(ot) => {
-                            ot.insert(b1)?;
-                        }
-                    }
-                    root.center_of_mass = calc_com(b1.pos, b1.mass, root.center_of_mass, root.mass);
-                    root.mass += b1.mass;
-                    Ok(())
-                } else if root.boundary.bottom_north_west().contains(&b1.pos) {
-                    match &mut root.bnw {
-                        None => {
-                            let ot = OcTree::Leaf(Leaf {
-                                boundary: root.boundary.bottom_north_west(),
-                                body: b1,
-                            });
-                            root.bnw = Some(Box::new(ot));
+                            *node = Some(Box::new(ot));
                         }
                         Some(ot) => {
                             ot.insert(b1)?;
@@ -244,105 +150,7 @@ impl OcTree {
                 graphics::draw(ctx, &circle, (ggez::mint::Point2 { x: 500.0, y: 500.0 },))?;
                 Ok(())
             }
-            OcTree::Root(root) => {
-                match &root.tne {
-                    None => {
-                        let r = root.boundary.top_north_east();
-                        let bounds = graphics::Rect::new(
-                            r.pos.x as f32,
-                            r.pos.y as f32,
-                            r.size as f32,
-                            r.size as f32,
-                        );
-                        let rectangle = graphics::Mesh::new_rectangle(
-                            ctx,
-                            graphics::DrawMode::stroke(1.0),
-                            bounds,
-                            graphics::WHITE,
-                        )?;
-                        graphics::draw(
-                            ctx,
-                            &rectangle,
-                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
-                        )
-                    }
-                    Some(ot) => ot.draw(ctx),
-                }
-                .ok();
-                match &root.tse {
-                    None => {
-                        let r = root.boundary.top_south_east();
-                        let bounds = graphics::Rect::new(
-                            r.pos.x as f32,
-                            r.pos.y as f32,
-                            r.size as f32,
-                            r.size as f32,
-                        );
-                        let rectangle = graphics::Mesh::new_rectangle(
-                            ctx,
-                            graphics::DrawMode::stroke(1.0),
-                            bounds,
-                            graphics::WHITE,
-                        )?;
-                        graphics::draw(
-                            ctx,
-                            &rectangle,
-                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
-                        )
-                    }
-                    Some(ot) => ot.draw(ctx),
-                }
-                .ok();
-                match &root.tsw {
-                    None => {
-                        let r = root.boundary.top_south_west();
-                        let bounds = graphics::Rect::new(
-                            r.pos.x as f32,
-                            r.pos.y as f32,
-                            r.size as f32,
-                            r.size as f32,
-                        );
-                        let rectangle = graphics::Mesh::new_rectangle(
-                            ctx,
-                            graphics::DrawMode::stroke(1.0),
-                            bounds,
-                            graphics::WHITE,
-                        )?;
-                        graphics::draw(
-                            ctx,
-                            &rectangle,
-                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
-                        )
-                    }
-                    Some(ot) => ot.draw(ctx),
-                }
-                .ok();
-                match &root.tnw {
-                    None => {
-                        let r = root.boundary.top_north_west();
-                        let bounds = graphics::Rect::new(
-                            r.pos.x as f32,
-                            r.pos.y as f32,
-                            r.size as f32,
-                            r.size as f32,
-                        );
-                        let rectangle = graphics::Mesh::new_rectangle(
-                            ctx,
-                            graphics::DrawMode::stroke(1.0),
-                            bounds,
-                            graphics::WHITE,
-                        )?;
-                        graphics::draw(
-                            ctx,
-                            &rectangle,
-                            (ggez::mint::Point2 { x: 500.0, y: 500.0 },),
-                        )
-                    }
-                    Some(ot) => ot.draw(ctx),
-                }
-                .ok();
-                Ok(())
-            }
+            OcTree::Root(_) => Ok(()),
         }
     }
 }
@@ -354,7 +162,7 @@ mod tests {
     #[test]
     fn test_octree_insert() {
         let mut ot = OcTree::new(Cube {
-            pos: Vector3::new(-5.0, -5.0, 0.0),
+            pos: Vector3::new(-5.0, -5.0, -5.0),
             size: 10.0,
         });
         let b1 = Body {
