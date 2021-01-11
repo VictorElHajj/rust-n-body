@@ -65,54 +65,43 @@ impl Cube {
     }
 
     pub fn region_boundary(&self, region: Region) -> Cube {
+        let new_size = self.size / 2.0;
         match region {
             TNE => Cube {
-                pos: Vector3::new(self.pos.x + self.size / 2.0, self.pos.y, self.pos.z),
-                size: self.size / 2.0,
+                pos: Vector3::new(self.pos.x + new_size, self.pos.y, self.pos.z),
+                size: new_size,
             },
             TSE => Cube {
-                pos: Vector3::new(
-                    self.pos.x + self.size / 2.0,
-                    self.pos.y + self.size / 2.0,
-                    self.pos.z,
-                ),
-                size: self.size / 2.0,
+                pos: Vector3::new(self.pos.x + new_size, self.pos.y + new_size, self.pos.z),
+                size: new_size,
             },
             TSW => Cube {
-                pos: Vector3::new(self.pos.x, self.pos.y + self.size / 2.0, self.pos.z),
-                size: self.size / 2.0,
+                pos: Vector3::new(self.pos.x, self.pos.y + new_size, self.pos.z),
+                size: new_size,
             },
             TNW => Cube {
                 pos: Vector3::new(self.pos.x, self.pos.y, self.pos.z),
-                size: self.size / 2.0,
+                size: new_size,
             },
             BNE => Cube {
-                pos: Vector3::new(
-                    self.pos.x + self.size / 2.0,
-                    self.pos.y,
-                    self.pos.z + self.size / 2.0,
-                ),
-                size: self.size / 2.0,
+                pos: Vector3::new(self.pos.x + new_size, self.pos.y, self.pos.z + new_size),
+                size: new_size,
             },
             BSE => Cube {
                 pos: Vector3::new(
-                    self.pos.x + self.size / 2.0,
-                    self.pos.y + self.size / 2.0,
-                    self.pos.z + self.size / 2.0,
+                    self.pos.x + new_size,
+                    self.pos.y + new_size,
+                    self.pos.z + new_size,
                 ),
-                size: self.size / 2.0,
+                size: new_size,
             },
             BSW => Cube {
-                pos: Vector3::new(
-                    self.pos.x,
-                    self.pos.y + self.size / 2.0,
-                    self.pos.z + self.size / 2.0,
-                ),
-                size: self.size / 2.0,
+                pos: Vector3::new(self.pos.x, self.pos.y + new_size, self.pos.z + new_size),
+                size: new_size,
             },
             BNW => Cube {
-                pos: Vector3::new(self.pos.x, self.pos.y, self.pos.z + self.size / 2.0),
-                size: self.size / 2.0,
+                pos: Vector3::new(self.pos.x, self.pos.y, self.pos.z + new_size),
+                size: new_size,
             },
         }
     }
