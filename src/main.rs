@@ -3,9 +3,7 @@ use ggez::{
     event::{self, EventHandler},
 };
 use ggez::{graphics, Context, ContextBuilder, GameResult};
-use n_body::{
-    body::Body, quadtree::QuadTree, rectangle::Rectangle, simulation::Simulation, vector::Vector2,
-};
+use n_body::{body::Body, cube::Cube, octree::OcTree, simulation::Simulation, vector::Vector3};
 use rand::Rng;
 
 fn main() {
@@ -14,12 +12,12 @@ fn main() {
     for i in 0..1000 {
         let b = Body {
             id: i,
-            pos: Vector2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0))
+            pos: Vector3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0)
                 * rng.gen_range(0.0..(i as f64 + 1.0)),
-            vel: Vector2::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0))
+            vel: Vector3::new(rng.gen_range(-1.0..1.0), rng.gen_range(-1.0..1.0), 0.0)
                 * rng.gen_range(0.0..(i as f64 + 1.0))
                 / 100.0,
-            acc: Vector2::zero(),
+            acc: Vector3::zero(),
             mass: 2_000_000.0,
         };
         bs.push(b);
@@ -27,17 +25,17 @@ fn main() {
     // Black hole
     let b = Body {
         id: 1001,
-        pos: Vector2::zero(),
-        vel: Vector2::zero(),
-        acc: Vector2::zero(),
+        pos: Vector3::zero(),
+        vel: Vector3::zero(),
+        acc: Vector3::zero(),
         mass: 2_000_000_000_000.0,
     };
     bs.push(b);
 
     let sim = Simulation {
         bodies: Box::new(bs),
-        qt: QuadTree::new(Rectangle {
-            pos: Vector2::zero(),
+        ot: OcTree::new(Cube {
+            pos: Vector3::zero(),
             size: 0.0,
         }),
         timestep: 1.0,

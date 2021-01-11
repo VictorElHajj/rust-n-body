@@ -1,6 +1,6 @@
 pub mod body;
+pub mod cube;
+pub mod octree;
 mod physics_helper;
-pub mod quadtree;
-pub mod rectangle;
 pub mod simulation;
 pub mod vector;

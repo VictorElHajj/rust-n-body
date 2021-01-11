@@ -13,5 +13,5 @@ ggez = "0.5"
 rayon = "1.5"
 
 [[bench]]
-name = "quadtree_insertion"
+name = "octree_insertion"
 harness = false

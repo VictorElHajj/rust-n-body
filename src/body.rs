@@ -1,10 +1,10 @@
-use crate::vector::Vector2;
+use crate::vector::Vector3;
 
 #[derive(Copy, Clone, PartialEq)]
 pub struct Body {
     pub id: u32,
-    pub pos: Vector2,
-    pub vel: Vector2,
-    pub acc: Vector2,
+    pub pos: Vector3,
+    pub vel: Vector3,
+    pub acc: Vector3,
     pub mass: f64,
 }
